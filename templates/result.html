@@ -48,16 +48,8 @@
                     <h3>Application Summary</h3>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <span class="label">Gender:</span>
-                            <span class="value">{{ applicant_data.Gender }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Marital Status:</span>
-                            <span class="value">{{ applicant_data.Married }}</span>
-                        </div>
-                        <div class="summary-item">
                             <span class="label">Dependents:</span>
-                            <span class="value">{{ applicant_data.Dependents }}</span>
+                            <span class="value">{{ applicant_data.Dependants_namber }}</span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Education:</span>
@@ -68,31 +60,41 @@
                             <span class="value">{{ applicant_data.Self_Employed }}</span>
                         </div>
                         <div class="summary-item">
-                            <span class="label">Property Area:</span>
-                            <span class="value">{{ applicant_data.Property_Area }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Applicant Income:</span>
-                            <span class="value">${{ "%.2f"|format(applicant_data.Applicant_Income) }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Co-applicant Income:</span>
-                            <span class="value">${{ "%.2f"|format(applicant_data.Coapplicant_Income) }}</span>
+                            <span class="label">Annual Income:</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Annula_Income|float) }}</span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Loan Amount:</span>
-                            <span class="value">${{ "%.2f"|format(applicant_data.Loan_Amount * 1000) }}</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Loan_Amount|float) }}</span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Loan Term:</span>
-                            <span class="value">{{ applicant_data.Loan_Amount_Term }} months</span>
+                            <span class="value">{{ applicant_data.Loan_Period_Months }} months</span>
                         </div>
                         <div class="summary-item">
-                            <span class="label">Credit History:</span>
-                            <span class="value">{{ 'Good' if applicant_data.Credit_History == 1 else 'Bad' }}</span>
+                            <span class="label">Credit Score:</span>
+                            <span class="value">{{ applicant_data.Credit_Score }}</span>
                         </div>
                     </div>
-                </div>
+                    <h4 class="summary-subtitle">Asset Summary</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="label">Residential Assets:</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Residential_Assets|float) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Commercial Assets:</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Commercial_Assets|float) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Luxury Assets:</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Luxury_Assets|float) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Bank Assets:</span>
+                            <span class="value">${{ "%.2f"|format(applicant_data.Bank_Assets|float) }}</span>
+                        </div>
+                    </div>
 
                 <div class="result-actions">
                     <a href="/" class="btn-primary">New Application</a>
