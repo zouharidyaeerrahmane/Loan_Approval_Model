@@ -33,26 +33,8 @@
                     <h3 class="section-title">Personal Information</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="Gender">Gender <span class="required">*</span></label>
-                            <select id="Gender" name="Gender" required>
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="Married">Marital Status <span class="required">*</span></label>
-                            <select id="Married" name="Married" required>
-                                <option value="">Select Status</option>
-                                <option value="Yes">Married</option>
-                                <option value="No">Single</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="Dependents">Number of Dependents <span class="required">*</span></label>
-                            <select id="Dependents" name="Dependents" required>
+                            <label for="Dependants_namber">Number of Dependents <span class="required">*</span></label>
+                            <select id="Dependants_namber" name="Dependants_namber" required>
                                 <option value="">Select Dependents</option>
                                 <option value="0">0</option>
                                 <option value="1">1</option>
@@ -60,9 +42,6 @@
                                 <option value="3+">3+</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="Education">Education Level <span class="required">*</span></label>
                             <select id="Education" name="Education" required>
@@ -80,16 +59,6 @@
                                 <option value="No">No</option>
                             </select>
                         </div>
-
-                        <div class="form-group">
-                            <label for="Property_Area">Property Area <span class="required">*</span></label>
-                            <select id="Property_Area" name="Property_Area" required>
-                                <option value="">Select Area</option>
-                                <option value="Urban">Urban</option>
-                                <option value="Semiurban">Semiurban</option>
-                                <option value="Rural">Rural</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
 
@@ -98,38 +67,56 @@
                     <h3 class="section-title">Financial Information</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="ApplicantIncome">Applicant Income ($/month) <span class="required">*</span></label>
-                            <input type="number" id="ApplicantIncome" name="ApplicantIncome" 
-                                   placeholder="e.g., 5000" min="0" step="1" required>
+                            <label for="Annula_Income">Annual Income ($) <span class="required">*</span></label>
+                            <input type="number" id="Annula_Income" name="Annula_Income" 
+                                   placeholder="e.g., 60000" min="0" step="1" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="CoapplicantIncome">Co-applicant Income ($/month) <span class="required">*</span></label>
-                            <input type="number" id="CoapplicantIncome" name="CoapplicantIncome" 
-                                   placeholder="e.g., 2000" min="0" step="1" required>
+                            <label for="Loan_Amount">Loan Amount ($) <span class="required">*</span></label>
+                            <input type="number" id="Loan_Amount" name="Loan_Amount" 
+                                   placeholder="e.g., 150000" min="0" step="1" required>
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
-                            <label for="LoanAmount">Loan Amount ($1000s) <span class="required">*</span></label>
-                            <input type="number" id="LoanAmount" name="LoanAmount" 
-                                   placeholder="e.g., 150" min="0" step="1" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="Loan_Amount_Term">Loan Term (months) <span class="required">*</span></label>
-                            <input type="number" id="Loan_Amount_Term" name="Loan_Amount_Term" 
+                            <label for="Loan_Period_Months">Loan Period (Months) <span class="required">*</span></label>
+                            <input type="number" id="Loan_Period_Months" name="Loan_Period_Months" 
                                    placeholder="e.g., 360" min="0" step="1" required>
                         </div>
+                    </div>
+                </div>
 
+                <!-- Asset Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">Asset & Credit Information</h3>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label for="Credit_History">Credit History <span class="required">*</span></label>
-                            <select id="Credit_History" name="Credit_History" required>
-                                <option value="">Select Credit History</option>
-                                <option value="1">Good (1)</option>
-                                <option value="0">Bad (0)</option>
-                            </select>
+                            <label for="Credit_Score">Credit Score (300-900) <span class="required">*</span></label>
+                            <input type="number" id="Credit_Score" name="Credit_Score" 
+                                   placeholder="e.g., 750" min="300" max="900" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="Residential_Assets">Residential Assets Value ($) <span class="required">*</span></label>
+                            <input type="number" id="Residential_Assets" name="Residential_Assets" 
+                                   placeholder="e.g., 200000" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="Commercial_Assets">Commercial Assets Value ($) <span class="required">*</span></label>
+                            <input type="number" id="Commercial_Assets" name="Commercial_Assets" 
+                                   placeholder="e.g., 150000" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="Luxury_Assets">Luxury Assets Value ($) <span class="required">*</span></label>
+                            <input type="number" id="Luxury_Assets" name="Luxury_Assets" 
+                                   placeholder="e.g., 50000" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="Bank_Assets">Bank Assets Value ($) <span class="required">*</span></label>
+                            <input type="number" id="Bank_Assets" name="Bank_Assets" 
+                                   placeholder="e.g., 100000" min="0" required>
+                        </div>
+                         <div class="form-group" style="visibility: hidden;">
+                            <!-- Hidden field to maintain grid structure -->
                         </div>
                     </div>
                 </div>

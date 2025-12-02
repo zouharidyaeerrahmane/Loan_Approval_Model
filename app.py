@@ -1,173 +1,120 @@
-from flask import Flask, render_template, request, jsonify
-import numpy as np
+from flask import Flask, request, render_template
 import pickle
+import numpy as np
 import os
 
 app = Flask(__name__)
 
-# Load the trained model (you'll need to provide the model file)
-MODEL_PATH = 'loan_model.pkl'
+# --- CONFIGURATION ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'model.pkl')
 
-def load_model():
-    """Load the trained linear regression model"""
-    try:
-        if os.path.exists(MODEL_PATH):
-            with open(MODEL_PATH, 'rb') as f:
-                model = pickle.load(f)
-            return model
-        else:
-            print(f"Warning: Model file '{MODEL_PATH}' not found. Using placeholder.")
-            return None
-    except Exception as e:
-        print(f"Error loading model: {e}")
-        return None
+# --- LOAD MODEL ---
+try:
+    with open(MODEL_PATH, 'rb') as file:
+        artifacts = pickle.load(file)
+    W = artifacts["W"]
+    b = artifacts["b"]
+    scaler = artifacts["scaler"]
+    print("✅ Model loaded successfully!")
+except FileNotFoundError:
+    print("❌ Error: 'models/model.pkl' not found.")
+    exit()
 
-model = load_model()
+# --- HELPER FUNCTIONS ---
+def sigmoid(z):
+    z = np.clip(z, -500, 500)
+    return 1 / (1 + np.exp(-z))
 
+def predict_logic(X, W, b):
+    Z = np.dot(X, W) + b
+    A = sigmoid(Z)
+    return (A >= 0.5).astype(int), A
+
+# --- ROUTES ---
 @app.route('/')
-def index():
-    """Render the loan application form"""
+def home():
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """Handle loan prediction request"""
     try:
-        # Get form data
-        gender = request.form.get('Gender')
-        married = request.form.get('Married')
-        dependents = request.form.get('Dependents')
-        education = request.form.get('Education')
-        self_employed = request.form.get('Self_Employed')
-        applicant_income = float(request.form.get('ApplicantIncome'))
-        coapplicant_income = float(request.form.get('CoapplicantIncome'))
-        loan_amount = float(request.form.get('LoanAmount'))
-        loan_amount_term = float(request.form.get('Loan_Amount_Term'))
-        credit_history = float(request.form.get('Credit_History'))
-        property_area = request.form.get('Property_Area')
+        # 1. Get data from Form and store for display
+        form_data = request.form
         
-        # Prepare features for model (you'll need to adjust this based on your model's preprocessing)
-        features = prepare_features(
-            gender, married, dependents, education, self_employed,
-            applicant_income, coapplicant_income, loan_amount,
-            loan_amount_term, credit_history, property_area
-        )
+        # Create a mutable dictionary for display purposes
+        applicant_data_display = dict(form_data)
+
+        # 2. Get values directly from the form, matching the model's feature names
         
-        # Make prediction
-        if model is not None:
-            prediction = model.predict([features])[0]
-            # Assuming binary classification: 1 = Approved, 0 = Rejected
-            result = "Approved" if prediction >= 0.5 else "Rejected"
-            confidence = prediction if prediction >= 0.5 else 1 - prediction
+        # Handle Dependents: Convert '3+' to 3
+        dependents_str = form_data.get('Dependants_namber', '0')
+        dependants_number = 3 if dependents_str == '3+' else int(dependents_str)
+
+        # Encode Education: Graduate=1, Not Graduate=0
+        education_val = 1 if form_data.get('Education') == 'Graduate' else 0
+        
+        # Encode Self-Employed: Yes=1, No=0
+        self_employed_val = 1 if form_data.get('Self_Employed') == 'Yes' else 0
+
+        # Get numerical values directly
+        annual_income = float(form_data.get('Annula_Income', 0))
+        loan_amount = float(form_data.get('Loan_Amount', 0))
+        loan_period_months = float(form_data.get('Loan_Period_Months', 0))
+        credit_score = float(form_data.get('Credit_Score', 0))
+        residential_assets = float(form_data.get('Residential_Assets', 0))
+        commercial_assets = float(form_data.get('Commercial_Assets', 0))
+        luxury_assets = float(form_data.get('Luxury_Assets', 0))
+        bank_assets = float(form_data.get('Bank_Assets', 0))
+
+        # 3. Create the feature array in the EXACT order the model expects
+        # Order: ['Dependants_namber', 'Education', 'Self_Employed', 'Annula_Income', 'Loan_Amount', 
+        #         'Loan_Period_Months', 'Credit_Score', 'Residential_Assets', 'Commercial_Assets', 
+        #         'Luxury_Assets', 'Bank_Assets']
+        features = [
+            dependants_number,
+            education_val,
+            self_employed_val,
+            annual_income,
+            loan_amount,
+            loan_period_months,
+            credit_score,
+            residential_assets,
+            commercial_assets,
+            luxury_assets,
+            bank_assets
+        ]
+
+        # 4. Prepare for Model
+        features_array = np.array(features).reshape(1, -1)
+        
+        # 5. Normalize
+        features_scaled = scaler.transform(features_array)
+        
+        # 6. Predict
+        pred_class, probability = predict_logic(features_scaled, W, b)
+        
+        # The model predicts 0 for 'Approved' and 1 for 'Rejected'
+        result_text = "Approved" if pred_class[0] == 0 else "Rejected"
+        
+        # Adjust confidence score based on prediction
+        if result_text == "Approved":
+            confidence_score = f"{float(1 - probability[0]) * 100:.2f}%"
         else:
-            # Placeholder prediction when model is not available
-            result = "Approved" if credit_history == 1 and applicant_income > 3000 else "Rejected"
-            confidence = 0.75
-        
+            confidence_score = f"{float(probability[0]) * 100:.2f}%"
+
+        # 7. Render Result Page with Data
         return render_template('result.html', 
-                             result=result, 
-                             confidence=f"{confidence*100:.2f}%",
-                             applicant_data={
-                                 'Gender': gender,
-                                 'Married': married,
-                                 'Dependents': dependents,
-                                 'Education': education,
-                                 'Self_Employed': self_employed,
-                                 'Applicant_Income': applicant_income,
-                                 'Coapplicant_Income': coapplicant_income,
-                                 'Loan_Amount': loan_amount,
-                                 'Loan_Amount_Term': loan_amount_term,
-                                 'Credit_History': credit_history,
-                                 'Property_Area': property_area
-                             })
-    
+                             result=result_text, 
+                             confidence=confidence_score,
+                             applicant_data=applicant_data_display)
+
     except Exception as e:
+        # Log the full error for debugging
+        print(f"❌ An error occurred: {e}")
+        import traceback
+        traceback.print_exc()
         return render_template('error.html', error=str(e))
 
-@app.route('/api/predict', methods=['POST'])
-def api_predict():
-    """API endpoint for predictions (JSON)"""
-    try:
-        data = request.get_json()
-        
-        # Prepare features
-        features = prepare_features(
-            data['Gender'], data['Married'], data['Dependents'],
-            data['Education'], data['Self_Employed'],
-            float(data['ApplicantIncome']), float(data['CoapplicantIncome']),
-            float(data['LoanAmount']), float(data['Loan_Amount_Term']),
-            float(data['Credit_History']), data['Property_Area']
-        )
-        
-        # Make prediction
-        if model is not None:
-            prediction = model.predict([features])[0]
-            result = "Approved" if prediction >= 0.5 else "Rejected"
-            confidence = prediction if prediction >= 0.5 else 1 - prediction
-        else:
-            result = "Approved" if data['Credit_History'] == 1 and data['ApplicantIncome'] > 3000 else "Rejected"
-            confidence = 0.75
-        
-        return jsonify({
-            'result': result,
-            'confidence': float(confidence),
-            'status': 'success'
-        })
-    
-    except Exception as e:
-        return jsonify({
-            'error': str(e),
-            'status': 'error'
-        }), 400
-
-def prepare_features(gender, married, dependents, education, self_employed,
-                    applicant_income, coapplicant_income, loan_amount,
-                    loan_amount_term, credit_history, property_area):
-    """
-    Prepare features for model prediction
-    Adjust this function based on your model's expected input format
-    """
-    # Encode categorical variables (adjust based on your model's encoding)
-    gender_encoded = 1 if gender == 'Male' else 0
-    married_encoded = 1 if married == 'Yes' else 0
-    
-    # Dependents encoding
-    if dependents == '0':
-        dependents_encoded = 0
-    elif dependents == '1':
-        dependents_encoded = 1
-    elif dependents == '2':
-        dependents_encoded = 2
-    else:  # '3+'
-        dependents_encoded = 3
-    
-    education_encoded = 1 if education == 'Graduate' else 0
-    self_employed_encoded = 1 if self_employed == 'Yes' else 0
-    
-    # Property area encoding
-    if property_area == 'Urban':
-        property_area_encoded = 2
-    elif property_area == 'Semiurban':
-        property_area_encoded = 1
-    else:  # Rural
-        property_area_encoded = 0
-    
-    # Combine all features
-    features = [
-        gender_encoded,
-        married_encoded,
-        dependents_encoded,
-        education_encoded,
-        self_employed_encoded,
-        applicant_income,
-        coapplicant_income,
-        loan_amount,
-        loan_amount_term,
-        credit_history,
-        property_area_encoded
-    ]
-    
-    return features
-
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5000)
