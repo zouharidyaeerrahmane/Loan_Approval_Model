@@ -68,7 +68,8 @@ This project is a web-based application that uses a machine learning model to pr
 ## Technologies Used
 
 -   **Backend:** Flask
--   **Machine Learning:** Scikit-learn, Pandas, NumPy
+-   **Machine Learning:** Scikit-learn just for preprocessing and splitting data, Pandas, NumPy
 -   **Frontend:** HTML, CSS
 -   **Development:** Jupyter Notebook
+
 
