@@ -93,9 +93,12 @@ def predict():
         
         # 6. Predict
         pred_class, probability = predict_logic(features_scaled, W, b)
-        
+        print(pred_class)
+        print(probability)
+
         # The model predicts 0 for 'Approved' and 1 for 'Rejected'
         result_text = "Approved" if pred_class[0] == 0 else "Rejected"
+        print(result_text)
         
         # Adjust confidence score based on prediction
         if result_text == "Approved":
