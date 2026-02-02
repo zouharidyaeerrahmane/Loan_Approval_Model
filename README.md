@@ -31,7 +31,7 @@ This project is a web-based application that uses a machine learning model to pr
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/zouharidyaeerrahmane/Loan_Approval_Model.git
     cd Loan_Approval_Model
     ```
 
@@ -71,5 +71,6 @@ This project is a web-based application that uses a machine learning model to pr
 -   **Machine Learning:** Scikit-learn just for preprocessing and splitting data, Pandas, NumPy
 -   **Frontend:** HTML, CSS
 -   **Development:** Jupyter Notebook
+
 
 
